@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Pool
+namespace RollSort.Runtime.Pool
 {
     public class ObjectPool<T> : AbstractObjectPool
     {
         private readonly List<T> _currentStock;
         private readonly Func<T> _factoryMethod;
         private readonly bool _isDynamic;
-        private readonly Action<T> _turnOnCallback;
         private readonly Action<T> _turnOffCallback;
+        private readonly Action<T> _turnOnCallback;
 
         public ObjectPool(Func<T> factoryMethod, Action<T> turnOnCallback, Action<T> turnOffCallback,
             int initialStock = 0, bool isDynamic = true)
@@ -22,9 +22,9 @@ namespace Pool
 
             _currentStock = new List<T>();
 
-            for (var i = 0; i < initialStock; i++)
+            for (int i = 0; i < initialStock; i++)
             {
-                var o = _factoryMethod();
+                T o = _factoryMethod();
                 _turnOffCallback(o);
                 _currentStock.Add(o);
             }
@@ -44,7 +44,7 @@ namespace Pool
 
         public T GetObject()
         {
-            var result = default(T);
+            T result = default(T);
             if (_currentStock.Count > 0)
             {
                 result = _currentStock[0];

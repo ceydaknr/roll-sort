@@ -1,13 +1,11 @@
-﻿using Data.ValueObject;
-using Pool;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Data.UnityObject
+namespace RollSort.Runtime.Pool
 {
-    [CreateAssetMenu(fileName = "SO_Pool", menuName = "GAME/SO_Pool", order = 0)]
+    [CreateAssetMenu(fileName = "SO_Pool", menuName = "Data/SO_Pool")]
     public class SO_Pool : ScriptableObject
     {
-        public SerializedDictionary<PoolTypes, PoolTypeData> PoolTypeDatas;
+        public SerializedDictionary<PoolType, PoolTypeData> PoolTypeDatas;
     }
 }

@@ -1,14 +1,13 @@
 ﻿using System;
-using Pool;
 using RollSort.Runtime.Utilities;
 using UnityEngine;
 
-namespace Signals
+namespace RollSort.Runtime.Pool
 {
     public class PoolSignals : MonoSingleton<PoolSignals>
     {
-        public Func<PoolTypes, Transform, GameObject> onGetPoolObject;
-        public Func<PoolTypes, GameObject> onGetPoolObjectNoParent;
-        public Action<PoolTypes, GameObject> onReleasePoolObject;
+        public Func<PoolType, Transform, GameObject> onGetPoolObject;
+        public Func<PoolType, GameObject> onGetPoolObjectNoParent;
+        public Action<PoolType, GameObject> onReleasePoolObject;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Data.ValueObject
+namespace RollSort.Runtime.Pool
 {
     [Serializable]
     public class PoolTypeData

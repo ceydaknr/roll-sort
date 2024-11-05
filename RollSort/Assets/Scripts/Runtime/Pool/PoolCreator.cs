@@ -1,30 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Data.UnityObject;
-using Managers;
-using Signals;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace Pool
+namespace RollSort.Runtime.Pool
 {
     public class PoolCreator : MonoBehaviour
     {
-        #region Self Variables
-
-        #region Private Variables
-
+        private readonly Dictionary<PoolType, GameObject> _poolGroup = new();
+        private PoolType _listCache;
         private Transform _objTransformCache;
         [ShowInInspector] private SO_Pool _poolData;
-        private PoolTypes _listCache;
-        private Dictionary<PoolTypes, GameObject> _poolGroup = new();
-
-        #endregion
-
-        #endregion
 
         private async void Awake()
         {
@@ -36,9 +24,9 @@ namespace Pool
 
         private void CreatGameObjectGroup()
         {
-            foreach (var value in _poolData.PoolTypeDatas)
+            foreach (KeyValuePair<PoolType, PoolTypeData> value in _poolData.PoolTypeDatas)
             {
-                var gameObjectCache = new GameObject
+                GameObject gameObjectCache = new()
                 {
                     name = value.Key.ToString(),
                     transform =
@@ -48,6 +36,30 @@ namespace Pool
                 };
                 _poolGroup.Add(value.Key, gameObjectCache);
             }
+        }
+
+        private GameObject OnGetPoolObject(PoolType poolType, Transform objTransform) //TODO:should be deleted transform
+        {
+            _listCache = poolType;
+            _objTransformCache = objTransform;
+            GameObject obj = PoolManager.Instance.GetObject<GameObject>(poolType);
+            obj.transform.SetParent(objTransform, false);
+            return obj;
+        }
+
+        private GameObject OnGetPoolObjectWithParent(PoolType poolType, Transform objTransform)
+        {
+            _listCache = poolType;
+            _objTransformCache = objTransform;
+            GameObject obj = PoolManager.Instance.GetObject<GameObject>(poolType);
+            return obj;
+        }
+
+        private void OnReleasePoolObject(PoolType poolType, GameObject obj)
+        {
+            _listCache = poolType;
+            obj.transform.SetParent(_poolGroup[_listCache].transform, false);
+            PoolManager.Instance.ReturnObject(obj, poolType);
         }
 
         #region Event Subscription
@@ -76,54 +88,30 @@ namespace Pool
 
         #endregion
 
-        private GameObject OnGetPoolObject(PoolTypes poolType, Transform objTransform)//TODO:should be deleted transform
-        {
-            _listCache = poolType;
-            _objTransformCache = objTransform;
-            var obj = PoolManager.Instance.GetObject<GameObject>(poolType);
-            obj.transform.SetParent(objTransform,false);
-            return obj;
-        }
-        private GameObject OnGetPoolObjectWithParent(PoolTypes poolType, Transform objTransform)
-        {
-            _listCache = poolType;
-            _objTransformCache = objTransform;
-            var obj = PoolManager.Instance.GetObject<GameObject>(poolType);
-           // obj.transform.parent = objTransform;
-            return obj;
-        }
-
-        private void OnReleasePoolObject(PoolTypes poolType, GameObject obj)
-        {
-            _listCache = poolType;
-            obj.transform.SetParent(_poolGroup[_listCache].transform,false);
-            PoolManager.Instance.ReturnObject(obj, poolType);
-        }
-
         #region Pool Initialization
 
         private void InitPool()
         {
-            foreach (var variable in _poolData.PoolTypeDatas)
+            foreach (KeyValuePair<PoolType, PoolTypeData> variable in _poolData.PoolTypeDatas)
             {
                 _listCache = variable.Key;
-                PoolManager.Instance.AddObjectPool<GameObject>(FabricateGameObject, TurnOnGameObject, TurnOffGameObject,
-                    variable.Key, variable.Value.ObjectLimit, true);
+                PoolManager.Instance.AddObjectPool(FabricateGameObject, TurnOnGameObject, TurnOffGameObject,
+                    variable.Key, variable.Value.ObjectLimit);
             }
         }
 
-        private void TurnOnGameObject(GameObject gameObject)
+        private void TurnOnGameObject(GameObject go)
         {
-            gameObject.transform.localPosition = _objTransformCache.position;
-            gameObject.SetActive(true);
+            go.transform.localPosition = _objTransformCache.position;
+            go.SetActive(true);
         }
 
-        private void TurnOffGameObject(GameObject gameObject)
+        private void TurnOffGameObject(GameObject go)
         {
-            gameObject.transform.localPosition = Vector3.zero;
-            gameObject.transform.rotation = Quaternion.identity;
-            gameObject.transform.SetParent(_poolGroup[_listCache].transform);
-            gameObject.SetActive(false);
+            go.transform.localPosition = Vector3.zero;
+            go.transform.rotation = Quaternion.identity;
+            go.transform.SetParent(_poolGroup[_listCache].transform);
+            go.SetActive(false);
         }
 
         private GameObject FabricateGameObject()
@@ -135,8 +123,9 @@ namespace Pool
 
         #endregion
     }
-    public enum PoolTypes
+
+    public enum PoolType
     {
-        Coin
+        Container
     }
 }
