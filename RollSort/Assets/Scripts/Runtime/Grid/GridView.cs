@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using RollSort.Runtime.Container;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -7,26 +8,30 @@ namespace RollSort.Runtime.GridManagement
 {
     public class GridView : MonoBehaviour
     {
-        [SerializeField] private GameObject cellPrefab;
         private GridController _controller;
-        public SO_GridData GridData { get; private set; }
+        private SO_GridData _gridData;
 
+        private IContainer[,] _grid;
+        
         private async void Awake()
         {
             AsyncOperationHandle<SO_GridData> handle = Addressables.LoadAssetAsync<SO_GridData>("SO_GridData");
-            GridData = await handle.ToUniTask();
+            _gridData = await handle.ToUniTask();
 
-            _controller = new GridController(this);
+            _controller = new GridController(this, _gridData);
         }
 
-        public void GenerateGrid()
+        public void AddContainer(int row, int column) //TODO: Add game object parameter.
         {
-            for (int row = 0; row < GridData.Height; row++)
-            for (int col = 0; col < GridData.Width; col++)
-            {
-                GameObject cellObject = Instantiate(cellPrefab, new Vector3(col, 0, row), Quaternion.identity);
-                cellObject.gameObject.name = $"Cell ({row} {col})";
-            }
+            // _grid[row, column] = ;
+            Debug.Log($"Adding container at {row}, {column}");
         }
+        
+        public void RemoveContainer(int row, int column) //TODO: Add game object parameter.
+        {
+            // _grid[row, column] = ;
+            Debug.Log($"Removing container at {row}, {column}");
+        }
+        
     }
 }

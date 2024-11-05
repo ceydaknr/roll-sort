@@ -544,7 +544,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e68ccdb6dcf4004c8f5aa787bd87ca8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellPrefab: {fileID: 5697319039753791284, guid: bb7a1db6ab1a62a44a01043e0f7c518a,
+  cellPrefab: {fileID: 1446613388881724378, guid: a91a8e9c92b07be40a867bacdb2deae1,
     type: 3}
 --- !u!4 &1861497525
 Transform:
