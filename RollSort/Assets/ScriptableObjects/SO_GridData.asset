@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01687c42c67b31f4d965d9bde08a5a85, type: 3}
   m_Name: SO_GridData
   m_EditorClassIdentifier: 
+  Width: 5
+  Height: 6
   CellSize: 5
   CellSpacing: 3

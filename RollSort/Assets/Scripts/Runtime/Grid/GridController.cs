@@ -1,4 +1,4 @@
-namespace RollSort.Test
+namespace RollSort.Runtime.GridManagement
 {
     public class GridController
     {
@@ -7,6 +7,8 @@ namespace RollSort.Test
         public GridController(GridView view)
         {
             _view = view;
+
+            _view.GenerateGrid();
         }
     }
 }

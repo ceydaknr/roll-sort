@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Data.ValueObject
+namespace RollSort.Runtime.InputManagement
 {
     [Serializable]
     public class InputData

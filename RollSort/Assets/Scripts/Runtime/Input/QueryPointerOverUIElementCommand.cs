@@ -2,15 +2,17 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Commands
+namespace RollSort.Runtime.InputManagement
 {
     public class QueryPointerOverUIElementCommand
     {
         public bool Execute()
         {
-            var eventData = new PointerEventData(EventSystem.current);
-            eventData.position = Input.mousePosition;
-            var results = new List<RaycastResult>();
+            PointerEventData eventData = new(EventSystem.current)
+            {
+                position = Input.mousePosition
+            };
+            List<RaycastResult> results = new();
             EventSystem.current.RaycastAll(eventData, results);
             return results.Count > 0;
         }
