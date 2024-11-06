@@ -18,6 +18,7 @@ namespace RollSort.Runtime.Pool
         {
             AsyncOperationHandle<SO_Pool> handle = Addressables.LoadAssetAsync<SO_Pool>("SO_Pool");
             _poolData = await handle.ToUniTask();
+
             CreatGameObjectGroup();
             InitPool();
         }
