@@ -1,4 +1,5 @@
-using Cysharp.Threading.Tasks;
+using RollSort.Runtime.Container;
+using RollSort.Runtime.EventHandler;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -7,26 +8,56 @@ namespace RollSort.Runtime.GridManagement
 {
     public class GridView : MonoBehaviour
     {
-        [SerializeField] private GameObject cellPrefab;
         private GridController _controller;
-        public SO_GridData GridData { get; private set; }
+
+        private IContainer[,] _grid;
+        private SO_GridData _gridData;
 
         private async void Awake()
         {
             AsyncOperationHandle<SO_GridData> handle = Addressables.LoadAssetAsync<SO_GridData>("SO_GridData");
-            GridData = await handle.ToUniTask();
 
-            _controller = new GridController(this);
+            await handle.Task;
+
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                _gridData = handle.Result;
+
+                _grid = new IContainer[_gridData.Height, _gridData.Width];
+                _controller = new GridController(this, _gridData);
+                EventManager.AddListener(GameEvent.OnLevelStarted, _controller.GenerateGrid);
+            }
+            else
+            {
+                Debug.LogError("SO_GridData load failed!");
+            }
         }
 
-        public void GenerateGrid()
+        private void Update()
         {
-            for (int row = 0; row < GridData.Height; row++)
-            for (int col = 0; col < GridData.Width; col++)
-            {
-                GameObject cellObject = Instantiate(cellPrefab, new Vector3(col, 0, row), Quaternion.identity);
-                cellObject.gameObject.name = $"Cell ({row} {col})";
-            }
+            if (Input.GetKeyDown(KeyCode.Space)) EventManager.Broadcast(GameEvent.OnLevelStarted);
+        }
+
+        private void OnEnable()
+        {
+            if (_controller != null) EventManager.AddListener(GameEvent.OnLevelStarted, _controller.GenerateGrid);
+        }
+
+        private void OnDisable()
+        {
+            if (_controller != null) EventManager.RemoveListener(GameEvent.OnLevelStarted, _controller.GenerateGrid);
+        }
+
+        public void AddContainer(int row, int column, IContainer container)
+        {
+            _grid[row, column] = container;
+            Debug.Log($"Adding {container} at {row}, {column}");
+        }
+
+        public void RemoveContainer(int row, int column)
+        {
+            Debug.Log($"Removing {_grid[row, column]} at {row}, {column}");
+            _grid[row, column] = null;
         }
     }
 }
